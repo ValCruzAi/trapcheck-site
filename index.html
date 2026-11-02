@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>trapcheck</title>
+<meta name="description" content="A free, read-only screen for obvious traps in trending Solana tokens. It will not tell you what to buy.">
+<style>
+:root{--bg:#f6f5f1;--ink:#191a18;--muted:#5d5f58;--line:#d9d7cf;--card:#fffefb;--trap:#b3361f;--caution:#94640a;--neutral:#3f5f6f;--code:#20221f;--codeink:#ecebe4}
+@media (prefers-color-scheme:dark){:root{--bg:#141513;--ink:#ecebe4;--muted:#a3a59c;--line:#30322d;--card:#1b1c1a;--trap:#ec7a62;--caution:#d9a441;--neutral:#8fb4c6;--code:#0d0e0c;--codeink:#ecebe4}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:920px;margin:0 auto;padding:0 20px}
+header{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:22px 0;flex-wrap:wrap}
+.logo{font:700 18px ui-monospace,Consolas,monospace;color:var(--ink);text-decoration:none}
+nav{display:flex;gap:18px;flex-wrap:wrap}
+nav a{color:var(--muted);text-decoration:none;font-size:15px}
+nav a:hover{color:var(--ink)}
+h1{font-size:clamp(34px,6vw,54px);line-height:1.08;letter-spacing:-.02em;margin:44px 0 18px;max-width:17ch}
+h2{font-size:28px;letter-spacing:-.01em;margin:0 0 12px}
+h3{font-size:17px;margin:0 0 4px}
+.lead{font-size:20px;color:var(--muted);max-width:38em;margin:0 0 26px}
+section{padding:54px 0;border-top:1px solid var(--line)}
+.hero{padding-bottom:54px}
+.btn{display:inline-block;background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:6px;text-decoration:none;font-weight:600}
+pre{background:var(--code);color:var(--codeink);padding:18px;border-radius:8px;overflow-x:auto;font:14px/1.6 ui-monospace,Consolas,monospace;margin:26px 0 0}
+.verdicts{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:22px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:18px}
+.card p{margin:0;color:var(--muted);font-size:15.5px}
+.tag{font:700 14px ui-monospace,Consolas,monospace;display:block;margin-bottom:6px}
+.t{color:var(--trap)}.c{color:var(--caution)}.n{color:var(--neutral)}
+.note{border-left:3px solid var(--trap);padding:2px 0 2px 16px;margin:24px 0 0;max-width:40em}
+.tablewrap{overflow-x:auto;margin-top:20px}
+table{border-collapse:collapse;width:100%;font-size:15.5px}
+th,td{text-align:left;padding:10px 12px 10px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600}
+ol.steps{list-style:none;counter-reset:s;padding:0;margin:22px 0 0}
+ol.steps li{counter-increment:s;position:relative;padding:0 0 18px 44px}
+ol.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:30px;height:30px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;font:600 14px ui-monospace,Consolas,monospace;background:var(--card)}
+ol.steps p{margin:0;color:var(--muted);font-size:15.5px}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:22px}
+ul.plain{margin:8px 0 0;padding-left:20px;color:var(--muted);font-size:15.5px}
+ul.plain li{margin-bottom:6px}
+.draft{background:#fff3c4;color:#4d3b00;padding:1px 6px;border-radius:4px;font-size:.92em}
+footer{border-top:1px solid var(--line);padding:30px 0 50px;color:var(--muted);font-size:14.5px}
+a{color:inherit}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <a class="logo" href="#top">trapcheck</a>
+  <nav>
+    <a href="#how">What it checks</a>
+    <a href="#not">What we don't sell</a>
+  </nav>
+</header>
+
+<main id="top">
+<div class="hero">
+  <h1>Is this coin an obvious trap?</h1>
+  <p class="lead">trapcheck is a free, read-only screen for trending Solana tokens. It does not trade, does not touch a wallet, and will not tell you what to buy.</p>
+  <a class="btn" href="#get">Get trapcheck</a>
+<pre>bun trapcheck.ts --top 10            # screen the current trending list
+bun trapcheck.ts --mints &lt;mint,mint&gt; # screen specific tokens</pre>
+</div>
+
+<section id="how">
+  <h2>Three verdicts</h2>
+  <div class="verdicts">
+    <div class="card"><span class="tag t">TRAP</span><p>At least one hard check failed, such as a live mint authority or almost no liquidity.</p></div>
+    <div class="card"><span class="tag c">CAUTION</span><p>Softer warnings, such as a pair under 30 minutes old or a concentrated top 10.</p></div>
+    <div class="card"><span class="tag n">NEUTRAL</span><p>No traps found by these checks. That is all it means.</p></div>
+  </div>
+  <p class="note"><strong>NEUTRAL does not mean buy.</strong> In testing, coins that passed every check still often lost money. Failing the screen marks a trap. Passing only means the obvious traps are absent.</p>
+
+  <div class="tablewrap">
+  <table>
+    <tr><th>Check</th><th>Source</th><th>TRAP when</th></tr>
+    <tr><td>Pool liquidity</td><td>DexScreener</td><td>Under $10K</td></tr>
+    <tr><td>Mint authority</td><td>Solana RPC</td><td>Still live, so supply can be inflated</td></tr>
+    <tr><td>Freeze authority</td><td>Solana RPC</td><td>Still live, so your tokens can be frozen</td></tr>
+    <tr><td>LP locked or burned</td><td>RugCheck</td><td>Under 50% on a pool under $100K</td></tr>
+    <tr><td>Top 10 holders, excluding the pool</td><td>Solana RPC</td><td>Over 50% of circulating supply</td></tr>
+    <tr><td>Risk flags and deployer history</td><td>RugCheck</td><td>Any "danger" flag or a flagged deployer</td></tr>
+  </table>
+  </div>
+</section>
+
+<section id="get">
+  <h2>Get trapcheck</h2>
+  <p>Free and MIT licensed. You need <a href="https://bun.sh">Bun</a> and a free <a href="https://helius.dev">Helius</a> API key. It uses about 30 free API calls per 10 tokens and no paid data.</p>
+  <a class="btn" href="https://github.com/ValCruzAi/trapcheck">View on GitHub</a>
+</section>
+
+<section id="next">
+  <h2>In the works</h2>
+  <p>A bot that runs your TradingView alerts from your own wallet, on your own computer, with limits you set and paper trading first. It is not available yet.</p>
+</section>
+
+<section id="not">
+  <h2>What we don't sell</h2>
+  <p>Trade calls, alert subscriptions, managed money, or any promise of returns. This is software only.</p>
+</section>
+</main>
+
+<footer>Software, not financial advice. No performance claims are made or implied. Trading crypto can lose all the money you put in.</footer>
+</div>
+</body>
+</html>
